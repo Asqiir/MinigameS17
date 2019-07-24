@@ -1,3 +1,6 @@
+#from .errors import *
+from errors import *
+
 class Item:
     def __init__(self, weight, size):
         self.weight = weight
@@ -5,19 +8,30 @@ class Item:
 
 class Consumable(Item):
     def __init__(self, weight, size, health_change, alc_change):
-        super().__init(weight, size)
+        super().__init__(weight, size)
         
         self.health_change = health_change
         self.alc_change = alc_change
 
 
-class InventoryExplodedError(RuntimeError):
-    pass
+
+class Bottle(Item):
+    def __init__(self, size):
+        super().__init__(0, size)
+        self.amount = 0
+        self.content = None
+    
+    def fill(self, amount, consumable):
+        if(self.amount + amount <= self.size) and (self.content == None or self.content.equals(consumable)):
+            self.amount += amount
+        else:
+            raise BottleExplodedError()
+
 
 
 class Inventory:
     def __init__(self):
-        self.content = []
+        self.content = {}
     
     def show_content(self):
         return content
@@ -25,9 +39,9 @@ class Inventory:
     def would_item_fit(self, item):
         raise NotImplentedError()
 
-    def put(self, item):
-        if would_item_fit(item):
-            content.append(item)
+    def put(self, name, item):
+        if self.would_item_fit(item):
+            self.content[name] = item
         else:
             raise InventoryExplodedError
     
@@ -52,5 +66,5 @@ class PortableInventory(Inventory):
         return self.__get_total_content_weight() + item.weight <= self.weight and self.__get_total_content_size() + item.size <= self.size
     
     def is_accessible(self):
-        return True
-
+        return True            
+    
