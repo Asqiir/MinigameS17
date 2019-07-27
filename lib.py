@@ -22,11 +22,20 @@ class Bottle(Item):
         self.content = None
     
     def fill(self, amount, consumable):
-        if(self.amount + amount <= self.size) and (self.content == None or self.content.equals(consumable)):
+        if self.content == None:
+            self.content = consumable
+            self.amount = amount        
+        elif (self.amount + amount <= self.size) and (self.content == None or self.content.equals(consumable)):
             self.amount += amount
         else:
             raise BottleExplodedError()
-
+    
+    def empty(self, amount):
+        self.amount -= amount
+        
+        if self.amount <= 0:
+            self.amount = 0
+            self.content = None
 
 
 class Inventory:
@@ -44,10 +53,9 @@ class Inventory:
             self.content[name] = item
         else:
             raise InventoryExplodedError
-    
-    def is_accessible(self):
-        raise NotImplentedError()
-
+        
+    def remove(self, name):
+        del self.content[name]
 
 
 class PortableInventory(Inventory):
@@ -65,6 +73,4 @@ class PortableInventory(Inventory):
     def would_item_fit(self, item):
         return self.__get_total_content_weight() + item.weight <= self.weight and self.__get_total_content_size() + item.size <= self.size
     
-    def is_accessible(self):
-        return True            
     
